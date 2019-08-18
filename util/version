@@ -1,0 +1,5 @@
+package util
+
+func Version() string {
+	return "{{.VERSION}}"
+}

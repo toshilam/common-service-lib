@@ -4,12 +4,12 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/todo/common-service-lib/data"
-	"github.com/todo/common-service-lib/util"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/validation"
 	"github.com/graphql-go/graphql"
 	"github.com/mitchellh/mapstructure"
+	"github.com/todo/common-service-lib/data"
+	"github.com/todo/common-service-lib/util"
 )
 
 type BaseHandler struct {
@@ -20,7 +20,12 @@ type BaseHandler struct {
 
 func NewBaseHandler(context *data.RequestVO) *BaseHandler {
 	var authVO data.AuthVO
-	mapstructure.Decode(context.Request.RequestContext.Authorizer, authVO)
+	decodeError := mapstructure.Decode(context.Request.RequestContext.Authorizer, &authVO)
+	logs.Error(authVO)
+	if decodeError != nil {
+		logs.Error("BaseHandler : NewBaseHandler : fail decoding :", decodeError)
+		panic(decodeError)
+	}
 	o := &BaseHandler{VO: &data.VO{ID: ""}, RequestVO: context, AuthVO: &authVO}
 	return o
 }
